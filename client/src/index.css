@@ -1,0 +1,12 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color: white;
+  background-color: darkslategray;
+  font-family: sans-serif;
+  margin: 1.5rem;
+}
