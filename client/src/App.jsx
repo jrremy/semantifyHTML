@@ -5,8 +5,8 @@ import "./App.css";
 
 function App() {
   const [selectedModeButtonIndex, setSelectedModeButtonIndex] = useState(0);
-  const [outputHTML, setOutputHTML] = useState("");
   const [inputHTML, setInputHTML] = useState("");
+  const [outputHTML, setOutputHTML] = useState("");
 
   const fetchSemanticHTML = async () => {
     const response = await axios.post("http://localhost:8080/convert", {
