@@ -17,27 +17,3 @@ button {
   resize: none;
   border-radius: 15px;
 }
-
-.menu-container {
-  display: flex;
-}
-
-.menu-container menu {
-  background-color: #333;
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.menu-button {
-  background: none;
-  border: none;
-  color: white;
-  padding: 5px;
-  margin: 0 5px; /* Adjust margin for spacing between buttons */
-  cursor: pointer;
-}
-
-.menu-button.selected {
-  background-color: white;
-  color: black;
-}

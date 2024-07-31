@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import "./App.css";
+import Input from "./components/Input.jsx";
 
 function App() {
-  const [selectedModeButtonIndex, setSelectedModeButtonIndex] = useState(0);
-  const [inputHTML, setInputHTML] = useState("");
   const [outputHTML, setOutputHTML] = useState("");
 
   const fetchSemanticHTML = async () => {
@@ -15,46 +14,9 @@ function App() {
     setOutputHTML((await response).data.semantic);
   };
 
-  function handleConvertButtonClick() {
-    fetchSemanticHTML();
-  }
-
-  function handleModeButtonClick(index) {
-    setSelectedModeButtonIndex(index);
-  }
-
-  function handleInputChange(event) {
-    setInputHTML(event.target.value);
-  }
-
-  const inputModes = ["Paste HTML", "Paste URL"];
-
   return (
     <>
-      <div className="menu-container">
-        <menu>
-          {inputModes.map((button, index) => (
-            <button
-              key={index}
-              className={`menu-button ${
-                selectedModeButtonIndex === index ? "selected" : ""
-              }`}
-              onClick={() => handleModeButtonClick(index)}
-            >
-              {button}
-            </button>
-          ))}
-        </menu>
-      </div>
-      <div class="input-area">
-        <h3>Input HTML code here:</h3>
-        <textarea
-          class="input-output-boxes"
-          value={inputHTML}
-          onChange={handleInputChange}
-        ></textarea>
-      </div>
-      <button onClick={handleConvertButtonClick}>Convert</button>
+      <Input onConvert={fetchSemanticHTML}/>
       <div class="output-area">
         <h3>Converted Semantic HTML:</h3>
         <textarea class="input-output-boxes" value={outputHTML}></textarea>
