@@ -7,7 +7,7 @@ import Input from "./components/Input.jsx";
 function App() {
   const [outputHTML, setOutputHTML] = useState("");
 
-  const fetchSemanticHTML = async () => {
+  const fetchSemanticHTML = async (inputHTML) => {
     const response = await axios.post("http://localhost:8080/convert", {
       html: inputHTML,
     });

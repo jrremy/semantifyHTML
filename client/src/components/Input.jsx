@@ -21,7 +21,7 @@ export default function Input({ onConvert }) {
   }
 
   function handleConvertButtonClick() {
-    onConvert();
+    onConvert(inputHTML);
   }
 
   function handleModeButtonClick(index) {
@@ -61,7 +61,7 @@ export default function Input({ onConvert }) {
               value={inputURL}
               onChange={handleURLInputChange}
             ></input>
-            <button onClick={onConvert}>Load</button>
+            <button onClick={handleLoadButtonClick}>Load</button>
           </>
         )}
         <h3>Input HTML code here:</h3>
