@@ -2,6 +2,13 @@ button {
   color: #333;
   height: 30px;
   border-radius: 10px;
+  cursor: pointer;
+}
+
+.input-output-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 .input-output-container input, textarea {

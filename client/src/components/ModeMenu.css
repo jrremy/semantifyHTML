@@ -14,7 +14,9 @@
   color: white;
   padding: 5px;
   margin: 0 5px; /* Adjust margin for spacing between buttons */
-  cursor: pointer;
+}
+.menu-button:hover {
+  background: #222;
 }
 
 .menu-button.selected {

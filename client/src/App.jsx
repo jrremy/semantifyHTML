@@ -3,6 +3,7 @@ import axios from "axios";
 
 import "./App.css";
 import Input from "./components/Input.jsx";
+import Output from "./components/Output.jsx";
 
 function App() {
   const [outputHTML, setOutputHTML] = useState("");
@@ -18,10 +19,7 @@ function App() {
     <>
       <div className="input-output-container">
         <Input onConvert={fetchSemanticHTML} />
-        <div className="output-area">
-          <h3>Converted Semantic HTML:</h3>
-          <textarea className="input-output-boxes" value={outputHTML}></textarea>
-        </div>
+        <Output output={outputHTML} />
       </div>
     </>
   );

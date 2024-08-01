@@ -8,14 +8,24 @@
 }
 
 .paste-url {
+    display: flex;
     flex-direction: row;
-    
+    gap: 5px;
+    width: 100%;
 }
 
-#url-input {
-    
+.paste-url button {
+    width: 50px;
+}
+
+.paste-url input {
+    flex: 1;
 }
 
 #convert-button {
     width: 80px;
+}
+
+#convert-button:hover {
+    color: #888;
 }
