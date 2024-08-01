@@ -16,10 +16,12 @@ function App() {
 
   return (
     <>
-      <Input onConvert={fetchSemanticHTML}/>
-      <div class="output-area">
-        <h3>Converted Semantic HTML:</h3>
-        <textarea class="input-output-boxes" value={outputHTML}></textarea>
+      <div className="input-output-container">
+        <Input onConvert={fetchSemanticHTML} />
+        <div className="output-area">
+          <h3>Converted Semantic HTML:</h3>
+          <textarea className="input-output-boxes" value={outputHTML}></textarea>
+        </div>
       </div>
     </>
   );

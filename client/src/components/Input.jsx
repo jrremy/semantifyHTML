@@ -40,38 +40,43 @@ export default function Input({ onConvert }) {
 
   return (
     <>
-      <ModeMenu
-        buttons={inputModes.map((button, index) => (
-          <button
-            key={index}
-            className={`menu-button ${
-              selectedModeButtonIndex === index ? "selected" : ""
-            }`}
-            onClick={() => handleModeButtonClick(index)}
-          >
-            {button}
-          </button>
-        ))}
-      ></ModeMenu>
-      <div class="input">
+      <div className="input-container">
+        <ModeMenu
+          buttons={inputModes.map((button, index) => (
+            <button
+              key={index}
+              className={`menu-button ${
+                selectedModeButtonIndex === index ? "selected" : ""
+              }`}
+              onClick={() => handleModeButtonClick(index)}
+            >
+              {button}
+            </button>
+          ))}
+        ></ModeMenu>
         {selectedModeButtonIndex === 1 && (
           <>
-            <input
-              class="input-area"
-              value={inputURL}
-              onChange={handleURLInputChange}
-            ></input>
-            <button onClick={handleLoadButtonClick}>Load</button>
+            <div className="paste-url">
+              <input
+                id="url-input"
+                value={inputURL}
+                onChange={handleURLInputChange}
+              ></input>
+              <button onClick={handleLoadButtonClick}>Load</button>
+            </div>
           </>
         )}
         <h3>Input HTML code here:</h3>
         <textarea
-          class="input-output-boxes"
+          className="input-output-boxes"
           value={inputHTML}
           onChange={handleHTMLInputChange}
         ></textarea>
+
+        <button id="convert-button" onClick={handleConvertButtonClick}>
+          Convert
+        </button>
       </div>
-      <button onClick={handleConvertButtonClick}>Convert</button>
     </>
   );
 }

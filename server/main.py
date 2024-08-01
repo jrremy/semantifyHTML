@@ -7,6 +7,7 @@ import re
 app = Flask(__name__)
 cors = CORS(app, origins='*')
 
+# Define the mapping between non-semantic classes/tags and semantic tags
 tag_mapping = {
     'div': {
         'nav': 'nav',
@@ -24,21 +25,36 @@ tag_mapping = {
     },
     'a': {
         'default': 'a'
+    },
+    'span': {
+        'highlight': 'mark',
+        'important': 'strong',
+        'emphasis': 'em'
     }
 }
 
 # Function to replace non-semantic tags with semantic tags
 def convert_to_semantic(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    
     for tag, class_map in tag_mapping.items():
         for cls, new_tag in class_map.items():
-            # Replace opening tags
-            html = re.sub(rf'<{tag} class="{cls}">', f'<{new_tag}>', html)
-            # Replace closing tags
-            html = re.sub(rf'</{tag}>', f'</{new_tag}>', html)
-
+            elements = soup.find_all(tag, class_=cls)
+            for element in elements:
+                element.name = new_tag
+                if 'class' in element.attrs:
+                    del element.attrs['class']
+    
     # Wrap nav-item elements in a <ul> if they are not already wrapped
-    html = re.sub(r'(<nav>.*?)(<li>.*?</li>)(.*?</nav>)', r'\1<ul>\2</ul>\3', html, flags=re.DOTALL)
-    return html
+    for nav in soup.find_all('nav'):
+        list_items = nav.find_all('li')
+        if list_items:
+            ul = soup.new_tag('ul')
+            for li in list_items:
+                ul.append(li.extract())
+            nav.append(ul)
+    
+    return soup.prettify()
 
 @app.route("/convert", methods=['POST'])
 def convert():
