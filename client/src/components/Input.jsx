@@ -56,7 +56,6 @@ export default function Input({ onConvert }) {
         ></ModeMenu>
         {selectedModeButtonIndex === 1 && (
           <>
-            
             <div className="paste-url">
               <input
                 placeholder="Enter a URL to extract HTML from"
@@ -72,6 +71,7 @@ export default function Input({ onConvert }) {
           className="input-output-boxes"
           value={inputHTML}
           onChange={handleHTMLInputChange}
+          placeholder="Enter HTML here..."
         ></textarea>
 
         <button id="convert-button" onClick={handleConvertButtonClick}>
