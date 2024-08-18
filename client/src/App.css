@@ -1,17 +1,23 @@
 button {
-  color: #333;
+  color: #000000;
   height: 30px;
   border-radius: 10px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  background: #cccccc;
 }
 
 .input-output-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 30px;
 }
 
-.input-output-container input, textarea {
+.input-output-container input,
+textarea {
   background-color: #444;
   color: #ccc;
   border: 0px; /* Light border for visibility */

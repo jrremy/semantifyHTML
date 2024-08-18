@@ -37,23 +37,35 @@ tag_mapping = {
 def convert_to_semantic(html):
     soup = BeautifulSoup(html, 'html.parser')
     
-    for tag, class_map in tag_mapping.items():
-        for cls, new_tag in class_map.items():
-            elements = soup.find_all(tag, class_=cls)
-            for element in elements:
-                element.name = new_tag
-                if 'class' in element.attrs:
-                    del element.attrs['class']
-    
-    # Wrap nav-item elements in a <ul> if they are not already wrapped
-    for nav in soup.find_all('nav'):
-        list_items = nav.find_all('li')
-        if list_items:
-            ul = soup.new_tag('ul')
-            for li in list_items:
-                ul.append(li.extract())
-            nav.append(ul)
-    
+    # Example 1: Convert <div> elements that have a specific role into <section>
+    for div in soup.find_all('div'):
+        if 'header' in div.get('class', []):
+            div.name = 'header'
+        elif 'footer' in div.get('class', []):
+            div.name = 'footer'
+        elif 'main' in div.get('class', []):
+            div.name = 'main'
+        elif 'nav' in div.get('class', []):
+            div.name = 'nav'
+        else:
+            div.name = 'section'
+
+    # Example 2: Convert <b> tags to <strong>
+    for b_tag in soup.find_all('b'):
+        b_tag.name = 'strong'
+
+    # Example 3: Convert <i> tags to <em>
+    for i_tag in soup.find_all('i'):
+        i_tag.name = 'em'
+
+    # Example 4: Convert <span> tags used as block elements into <p>
+    for span_tag in soup.find_all('span'):
+        if 'block' in span_tag.get('class', []):  # Example condition
+            span_tag.name = 'p'
+
+    # You can add more rules here depending on your specific use case
+
+    # Return the modified HTML content
     return soup.prettify()
 
 @app.route("/convert", methods=['POST'])

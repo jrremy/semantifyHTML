@@ -11,12 +11,14 @@
 .menu-button {
   background: none;
   border: none;
-  color: white;
+  color: #b3b3b3;
   padding: 5px;
   margin: 0 5px; /* Adjust margin for spacing between buttons */
+  transition: all 0.2s ease-in-out;
 }
 .menu-button:hover {
   background: #222;
+  color: white;
 }
 
 .menu-button.selected {

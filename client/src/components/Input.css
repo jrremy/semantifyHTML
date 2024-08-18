@@ -1,31 +1,50 @@
-.input-container {
-    background-color: #333;
-    padding: 30px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
+.input-box {
+  background-color: #333;
+  padding: 30px;
+  border-radius: 10px;
+  width: fit-content;
 }
 
-.paste-url {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    width: 100%;
+.url-container {
+  flex-direction: column;
+  align-items: center;
 }
 
-.paste-url button {
-    width: 50px;
+.url-enter {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  width: 100%;
 }
 
-.paste-url input {
-    flex: 1;
+.url-enter button {
+  width: 50px;
 }
 
-#convert-button {
-    width: 80px;
+.url-enter input {
+  flex: 1;
 }
 
-#convert-button:hover {
-    color: #888;
+#url-pulse-loader {
+  margin-top: 10px;
+}
+
+.convert-container {
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.convert-container button {
+  width: 90px;
+  height: 40px;
+}
+
+#convert-pulse-loader {
+  margin-left: 15px;
+}
+
+.import-file button {
+  width: 20%px;
 }
