@@ -8,5 +8,8 @@
   color: white;
   background-color: darkslategray;
   font-family: sans-serif;
-  margin: 1.5rem;
+}
+
+body {
+  margin: 0px;
 }

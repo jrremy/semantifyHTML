@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import "./App.css";
+import Navbar from "./components/Navbar.jsx";
 import Input from "./components/Input.jsx";
 import Output from "./components/Output.jsx";
 
 function App() {
+  const [activeTab, setActiveTab] = useState("Convert");
   const [outputHTML, setOutputHTML] = useState("");
   const [loadingConvert, setLoadingConvert] = useState(false);
 
@@ -24,11 +26,26 @@ function App() {
     }
   };
 
+  const tabs = ["Convert", "About"];
+
   return (
     <>
-      <div className="input-output-container">
-        <Input onConvert={fetchSemanticHTML} loadingConvert={loadingConvert} />
-        <Output output={outputHTML} />
+      <Navbar tabs={tabs} onSwitch={setActiveTab}></Navbar>
+      <div class="body">
+        <div>
+          <h1>SemantifyHTML</h1>
+          <h2>Make your markup code more accesible!</h2>
+        </div>
+        {activeTab === "Convert" && (
+          <div className="input-output-container">
+            <Input
+              onConvert={fetchSemanticHTML}
+              loadingConvert={loadingConvert}
+            />
+            <Output output={outputHTML} />
+          </div>
+        )}
+        {activeTab === "About" && <p>About section text</p>}
       </div>
     </>
   );

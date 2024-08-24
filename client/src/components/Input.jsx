@@ -6,7 +6,7 @@ import "./Input.css";
 import ModeMenu from "./ModeMenu.jsx";
 
 export default function Input({ onConvert, loadingConvert }) {
-  const [selectedModeButtonIndex, setSelectedModeButtonIndex] = useState(0);
+  const [inputMode, setinputMode] = useState("Paste HTML");
   const [inputURL, setInputURL] = useState("");
   const [loadingURL, setLoadingURL] = useState(false);
   const [inputHTML, setInputHTML] = useState("");
@@ -53,8 +53,8 @@ export default function Input({ onConvert, loadingConvert }) {
     onConvert(inputHTML);
   }
 
-  function handleModeButtonClick(index) {
-    setSelectedModeButtonIndex(index);
+  function handleModeButtonClick(mode) {
+    setinputMode(mode);
   }
 
   function handleURLInputChange(event) {
@@ -71,19 +71,11 @@ export default function Input({ onConvert, loadingConvert }) {
     <>
       <div className="input-box">
         <ModeMenu
-          buttons={inputModes.map((button, index) => (
-            <button
-              key={button}
-              className={`menu-button ${
-                selectedModeButtonIndex === index ? "selected" : ""
-              }`}
-              onClick={() => handleModeButtonClick(index)}
-            >
-              {button}
-            </button>
-          ))}
+          modes={inputModes}
+          activeMode={inputMode}
+          onSwitch={handleModeButtonClick}
         ></ModeMenu>
-        {selectedModeButtonIndex === 1 && (
+        {inputMode === "Paste URL" && (
           <>
             <div className="url-container">
               <div className="url-enter">
@@ -104,7 +96,7 @@ export default function Input({ onConvert, loadingConvert }) {
             </div>
           </>
         )}
-        {selectedModeButtonIndex === 2 && (
+        {inputMode === "Import File" && (
           <>
             <div className="import-file">
               <input

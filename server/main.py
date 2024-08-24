@@ -8,6 +8,7 @@ app = Flask(__name__)
 cors = CORS(app, origins='*')
 
 # Define the mapping between non-semantic classes/tags and semantic tags
+# NOTE: this dict is no longer in use for the itme being
 tag_mapping = {
     'div': {
         'nav': 'nav',
