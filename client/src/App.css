@@ -1,4 +1,4 @@
-.body {
+main {
   margin: 1.5rem;
 }
 
@@ -36,4 +36,9 @@ textarea {
   font-size: 14px; /* Adjust font size as needed */
   box-sizing: border-box; /* Ensure padding is included in width/height */
   resize: none;
+}
+
+header h2 {
+  margin: 1.5rem;
+  margin-top: 100px;
 }

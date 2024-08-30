@@ -4,7 +4,7 @@ import "./Navbar.css";
 export default function Navbar({ tabs, activeTab, onSwitch }) {
   return (
     <nav className="navbar">
-      <div className="navbar-logo">SemantifyHTML</div>
+      <h1 className="navbar-logo">SemantifyHTML</h1>
       <ul className="navbar-links">
         {tabs.map((button) => (
           <li

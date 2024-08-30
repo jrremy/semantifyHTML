@@ -1,6 +1,5 @@
 .navbar {
   background-color: #333;
-  padding: 5px;
   display: flex;
   align-items: center;
   position: fixed;
@@ -13,7 +12,7 @@
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
-  margin-left: 5px;
+  margin-left: 15px;
 }
 
 .navbar-links {
@@ -31,4 +30,8 @@
 .navbar-links li:hover {
   color: #ddd;
   transition: all 0.2s ease-in-out;
+}
+
+.navbar-link.selected {
+  background: #ccc;
 }

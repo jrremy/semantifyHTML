@@ -30,12 +30,11 @@ function App() {
 
   return (
     <>
-      <Navbar tabs={tabs} onSwitch={setActiveTab}></Navbar>
-      <div class="body">
-        <div>
-          <h1>SemantifyHTML</h1>
-          <h2>Make your markup code more accesible!</h2>
-        </div>
+      <header>
+        <Navbar tabs={tabs} onSwitch={setActiveTab}></Navbar>
+        <h2>Make your markup code more accesible!</h2>
+      </header>
+      <main>
         {activeTab === "Convert" && (
           <div className="input-output-container">
             <Input
@@ -46,7 +45,7 @@ function App() {
           </div>
         )}
         {activeTab === "About" && <p>About section text</p>}
-      </div>
+      </main>
     </>
   );
 }
