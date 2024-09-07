@@ -10,17 +10,30 @@ button {
   transition: all 0.2s ease-in-out;
 }
 
-button:hover {
+button:enabled:hover {
   background: #cccccc;
 }
 
-.input-output-container {
+button:disabled {
+  cursor: default;
+}
+
+.convert-page {
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
   gap: 30px;
+  align-items: center;
 }
 
-.input-output-container input,
+.convert-section {
+  background-color: #333;
+  padding: 30px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+input,
 textarea {
   background-color: #444;
   color: #ccc;
@@ -29,16 +42,11 @@ textarea {
   border-radius: 10px;
 }
 
-.input-output-boxes {
+textarea.input-output {
   width: 700px; /* Full width */
   height: 300px; /* Adjust height as needed */
   font-family: monospace; /* Use a monospaced font for code */
   font-size: 14px; /* Adjust font size as needed */
   box-sizing: border-box; /* Ensure padding is included in width/height */
   resize: none;
-}
-
-header h2 {
-  margin: 1.5rem;
-  margin-top: 100px;
 }

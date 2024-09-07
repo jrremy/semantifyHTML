@@ -1,10 +1,3 @@
-.input-box {
-  background-color: #333;
-  padding: 30px;
-  border-radius: 10px;
-  width: fit-content;
-}
-
 .url-container {
   flex-direction: column;
   align-items: center;

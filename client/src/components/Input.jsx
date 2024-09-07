@@ -111,10 +111,10 @@ export default function Input({ onConvert, loadingConvert }) {
         )}
         <h3>Input HTML</h3>
         <textarea
-          className="input-output-boxes"
+          className="input-output"
           value={inputHTML}
           onChange={handleHTMLInputChange}
-          placeholder="Enter HTML here..."
+          placeholder="Enter Your HTML"
         ></textarea>
 
         <div className="convert-container">

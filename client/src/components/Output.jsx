@@ -1,4 +1,6 @@
 import { useState } from "react";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+
 import "./Output.css";
 
 export default function Output({ output }) {
@@ -24,12 +26,11 @@ export default function Output({ output }) {
     <>
       <div className="output-box">
         <h3>Converted Semantic HTML</h3>
-        <textarea
-          className="input-output-boxes"
-          value={output}
-          readOnly
-        ></textarea>
-        <button onClick={copyToClipboard}>Copy to Clipboard</button>
+        <textarea className="input-output" value={output} readOnly></textarea>
+        <button id="copy-button" onClick={copyToClipboard}>
+          <ContentCopyIcon fontSize="small" />
+          Copy to Clipboard
+        </button>
         {copySuccess && <span className="copy-success">{copySuccess}</span>}
       </div>
     </>

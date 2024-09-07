@@ -9,42 +9,50 @@ cors = CORS(app, origins='*')
 
 def convert_to_semantic(html):
     soup = BeautifulSoup(html, 'html.parser')
-    
-    # Convert <div> elements that have a specific role into <section>
+    changes = []
+
+    def log_change(tag, new_name):
+        changes.append({
+            'original_tag': tag.name,
+            'new_tag': new_name,
+            'content': tag.text.strip()
+        })
+        tag.name = new_name
+
+    # Replace <div> elements with semantic alternatives if the tag name is in their class
     for div in soup.find_all('div'):
         if 'header' in div.get('class', []):
-            div.name = 'header'
+            log_change(div, 'header')
         elif 'footer' in div.get('class', []):
-            div.name = 'footer'
+            log_change(div, 'footer')
         elif 'main' in div.get('class', []):
-            div.name = 'main'
+            log_change(div, 'main')
         elif 'nav' in div.get('class', []):
-            div.name = 'nav'
-        else:
-            div.name = 'section'
+            log_change(div, 'nav')
 
     # Convert <b> tags to <strong>
     for b_tag in soup.find_all('b'):
-        b_tag.name = 'strong'
+        log_change(b_tag, 'strong')
 
     # Convert <i> tags to <em>
     for i_tag in soup.find_all('i'):
-        i_tag.name = 'em'
+        log_change(i_tag, 'em')
 
     # Convert <span> tags used as block elements into <p>
     for span_tag in soup.find_all('span'):
         if 'block' in span_tag.get('class', []):  # Example condition
-            span_tag.name = 'p'
+            log_change(span_tag, 'p')
 
     # Can add more rules here depending on specific use case
-
-    return soup.prettify()
+    
+    modified_html = soup.prettify()
+    return modified_html, changes
 
 @app.route("/convert", methods=['POST'])
 def convert():
     input_html = request.json.get('html', '')
-    semantic_html = convert_to_semantic(input_html)
-    return jsonify({"semantic": semantic_html})
+    semantic_html, changes = convert_to_semantic(input_html)
+    return jsonify({"semantic": semantic_html, "changes": changes})
 
 @app.route("/load", methods=['POST'])
 def load_url():
