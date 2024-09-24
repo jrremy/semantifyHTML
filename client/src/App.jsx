@@ -12,6 +12,7 @@ function App() {
   const [outputHTML, setOutputHTML] = useState("");
   const [loadingConvert, setLoadingConvert] = useState(false);
   const [changes, setChanges] = useState([]);
+  const [showChanges, setShowChanges] = useState(false);
 
   const fetchSemanticHTML = async (inputHTML) => {
     setLoadingConvert(true);
@@ -52,11 +53,13 @@ function App() {
               />
             </div>
             <div className="convert-section">
-              <Output output={outputHTML} />
+              <Output output={outputHTML} setShowChanges={setShowChanges} />
             </div>
-            <div className="convert-section">
-              <Changes changes={changes} />
-            </div>
+            {showChanges && (
+              <div className="convert-section">
+                <Changes changes={changes} />
+              </div>
+            )}
           </div>
         )}
         {activeTab === "About" && <p>About section text</p>}

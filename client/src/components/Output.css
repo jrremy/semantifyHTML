@@ -3,11 +3,27 @@
   flex-direction: column;
 }
 
+.output-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.copy-success {
+  transition: all 0.2s;
+}
+
 #copy-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
   height: 40px;
-  margin-top: 30px;
+  color: white;
+  background: transparent;
+  margin-top: 0px;
+}
+
+#copy-button:hover {
+  color: #cccccc;
 }

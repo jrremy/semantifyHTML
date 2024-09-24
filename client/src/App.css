@@ -5,12 +5,14 @@ main {
 button {
   color: #000000;
   height: 30px;
+  border: 0px;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
 
 button:enabled:hover {
+  color: #000000;
   background: #cccccc;
 }
 

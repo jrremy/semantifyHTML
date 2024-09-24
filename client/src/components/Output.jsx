@@ -3,7 +3,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 import "./Output.css";
 
-export default function Output({ output }) {
+export default function Output({ output, setShowChanges }) {
   // State to show copy success message
   const [copySuccess, setCopySuccess] = useState("");
 
@@ -25,13 +25,15 @@ export default function Output({ output }) {
   return (
     <>
       <div className="output-box">
-        <h3>Converted Semantic HTML</h3>
+        <div className="output-header">
+          <h3>Converted Semantic HTML</h3>
+          <button id="copy-button" onClick={copyToClipboard}>
+            <ContentCopyIcon fontSize="small" />
+          </button>
+          {copySuccess && <span className="copy-success">{copySuccess}</span>}
+        </div>
         <textarea className="input-output" value={output} readOnly></textarea>
-        <button id="copy-button" onClick={copyToClipboard}>
-          <ContentCopyIcon fontSize="small" />
-          Copy to Clipboard
-        </button>
-        {copySuccess && <span className="copy-success">{copySuccess}</span>}
+        <button onClick={setShowChanges}>View Changes</button>
       </div>
     </>
   );
