@@ -26,13 +26,16 @@ export default function Changes({ changes }) {
           ))}
         </div> */}
 
-      {changes.length > 0 && (
-        <div className="change-box">
-          <p>Original Tag: {changes[currentChangeIndex].original_tag}</p>
-          <p>New Tag: {changes[currentChangeIndex].new_tag}</p>
-          <p>Content: {changes[currentChangeIndex].content}</p>
-        </div>
-      )}
+      <div className="change-box">
+        {changes.length === 0 && <p>No changes found</p>}
+        {changes.length > 0 && (
+          <>
+            <p>Original Tag: {changes[currentChangeIndex].original_tag}</p>
+            <p>New Tag: {changes[currentChangeIndex].new_tag}</p>
+            <p>Content: {changes[currentChangeIndex].content}</p>
+          </>
+        )}
+      </div>
 
       <div>
         <button
@@ -43,7 +46,9 @@ export default function Changes({ changes }) {
         </button>
         <button
           onClick={incrementChangeIndex}
-          disabled={currentChangeIndex === changes.length - 1}
+          disabled={
+            (currentChangeIndex === changes.length - 1) | (changes.length === 0)
+          }
         >
           Next Change
         </button>

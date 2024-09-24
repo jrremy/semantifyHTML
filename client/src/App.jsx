@@ -39,14 +39,11 @@ function App() {
           activeTab={activeTab}
           onSwitch={setActiveTab}
         ></Navbar>
-        <h2 id="header-slogan">Make your markup code more accesible!</h2>
       </header>
       <main>
         {activeTab === "Convert" && (
           <div className="convert-page">
-            <h2 id="slogan" aria-labelledby="header-slogan">
-              Make your markup code more accessible!
-            </h2>
+            <h2 id="slogan">Make your markup code more accessible!</h2>
 
             <div className="convert-section">
               <Input
@@ -58,7 +55,7 @@ function App() {
               <Output output={outputHTML} />
             </div>
             <div className="convert-section">
-              {outputHTML != "" && <Changes changes={changes} />}
+              <Changes changes={changes} />
             </div>
           </div>
         )}

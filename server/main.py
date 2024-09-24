@@ -1,8 +1,12 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from bs4 import BeautifulSoup
 import requests
 from playwright.sync_api import sync_playwright
+import openai
+
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 app = Flask(__name__)
 cors = CORS(app, origins='*')
@@ -53,6 +57,24 @@ def convert():
     input_html = request.json.get('html', '')
     semantic_html, changes = convert_to_semantic(input_html)
     return jsonify({"semantic": semantic_html, "changes": changes})
+
+def generate_explanation(original_tag, new_tag):
+    prompt = f"Explain why the HTML tag '{original_tag}' was changed to '{new_tag}' in a brief and clear way."
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=50
+    )
+    return response.choices[0].text.strip()
+
+@app.route('/explanation', methods=['POST'])
+def get_explanation():
+    data = request.json
+    original_tag = data['original_tag']
+    new_tag = data['new_tag']
+    explanation = generate_explanation(original_tag, new_tag)
+    return jsonify({'explanation': explanation})
+
 
 @app.route("/load", methods=['POST'])
 def load_url():
