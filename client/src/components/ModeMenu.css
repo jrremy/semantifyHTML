@@ -16,9 +16,14 @@
   margin: 5px; /* Adjust margin for spacing between buttons */
   transition: all 0.2s ease-in-out;
 }
-.menu-button:hover {
-  background: #222;
+.menu-button:enabled:hover {
+  background: none;
   color: white;
+}
+
+.menu-button.selected:enabled:hover {
+  background: white;
+  color: #333;
 }
 
 .menu-button.selected {
