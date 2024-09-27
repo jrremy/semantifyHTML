@@ -5,6 +5,12 @@ import "./Changes.css";
 export default function Changes({ changes }) {
   const [currentChangeIndex, setCurrentChangeIndex] = useState(0);
 
+  const fetchExplanation = async (change) => {
+    const response = await axios.post("http://localhost:8080/convert", {
+      change: change,
+    });
+  };
+
   function decrementChangeIndex() {
     setCurrentChangeIndex((currentChangeIndex) => currentChangeIndex - 1);
   }

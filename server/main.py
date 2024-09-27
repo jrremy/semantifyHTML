@@ -60,32 +60,29 @@ def convert():
 
 def generate_explanation(original_tag, new_tag):
     prompt = f"Explain why the HTML tag '{original_tag}' was changed to '{new_tag}' in a brief and clear way."
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=50
-    )
-    return response.choices[0].text.strip()
+    try:
+        # Call the OpenAI Completion API with gpt-4o-mini
+        response = openai.Completion.create(
+            engine="gpt-4o-mini",  # Use the GPT-4 Mini model
+            prompt=prompt,
+            max_tokens=50
+        )
+        return response.choices[0].text.strip()  # Extract the text from the response
+    except Exception as e:
+        return f"Error generating explanation: {str(e)}"
 
 @app.route('/explanation', methods=['POST'])
 def get_explanation():
     data = request.json
-    original_tag = data['original_tag']
-    new_tag = data['new_tag']
+    original_tag = data.get('original_tag')
+    new_tag = data.get('new_tag')
+
+    if not original_tag or not new_tag:
+        return jsonify({'error': 'Both original_tag and new_tag are required.'}), 400
+
     explanation = generate_explanation(original_tag, new_tag)
     return jsonify({'explanation': explanation})
 
-
-@app.route("/load", methods=['POST'])
-def load_url():
-    url = request.json.get('url', '')
-    try:
-        html_content = load_full_page_html(url)
-        soup = BeautifulSoup(html_content, 'html.parser')
-        return jsonify({"content": soup.prettify()})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
 def load_full_page_html(url):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Launch headless browser
@@ -97,6 +94,16 @@ def load_full_page_html(url):
         content = page.content()
         browser.close()
         return content
+
+@app.route("/load", methods=['POST'])
+def load_url():
+    url = request.json.get('url', '')
+    try:
+        html_content = load_full_page_html(url)
+        soup = BeautifulSoup(html_content, 'html.parser')
+        return jsonify({"content": soup.prettify()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
