@@ -16,11 +16,14 @@ def convert_to_semantic(html):
     changes = []
 
     def log_change(tag, new_name):
+        original_tag_html = str(tag)
+        new_tag_html = str(tag)
+        
         changes.append({
-            'original_tag': tag.name,
-            'new_tag': new_name,
-            'content': tag.text.strip()
+            'original_tag': original_tag_html,
+            'new_tag': new_tag_html,
         })
+        
         tag.name = new_name
 
     # Replace <div> elements with semantic alternatives if the tag name is in their class
