@@ -4,9 +4,12 @@ from flask_cors import CORS
 from bs4 import BeautifulSoup
 import requests
 from playwright.sync_api import sync_playwright
-import openai
+from openai import OpenAI
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
 
 app = Flask(__name__)
 cors = CORS(app, origins='*')
@@ -16,9 +19,26 @@ def convert_to_semantic(html):
     changes = []
 
     def log_change(tag, new_name):
-        original_tag_html = str(tag)
-        new_tag_html = str(tag)
-        
+        # Get classes and id, if available
+        classes = ' '.join(tag.get('class', []))
+        tag_id = tag.get('id', '')
+
+        # Construct original tag HTML
+        original_tag_parts = [f'<{tag.name}']
+        if classes:
+            original_tag_parts.append(f'class="{classes}"')
+        if tag_id:
+            original_tag_parts.append(f'id="{tag_id}"')
+        original_tag_html = ' '.join(original_tag_parts) + '>'
+
+        # Construct new tag HTML
+        new_tag_parts = [f'<{new_name}']
+        if classes:
+            new_tag_parts.append(f'class="{classes}"')
+        if tag_id:
+            new_tag_parts.append(f'id="{tag_id}"')
+        new_tag_html = ' '.join(new_tag_parts) + '>'
+
         changes.append({
             'original_tag': original_tag_html,
             'new_tag': new_tag_html,
@@ -26,15 +46,15 @@ def convert_to_semantic(html):
         
         tag.name = new_name
 
-    # Replace <div> elements with semantic alternatives if the tag name is in their class
+    # Replace <div> elements with semantic alternatives if the tag name is in their class or id
     for div in soup.find_all('div'):
-        if 'header' in div.get('class', []):
+        if 'header' in div.get('class', []) or 'header' in div.get('id', []):
             log_change(div, 'header')
         elif 'footer' in div.get('class', []):
             log_change(div, 'footer')
         elif 'main' in div.get('class', []):
             log_change(div, 'main')
-        elif 'nav' in div.get('class', []):
+        elif 'nav' in div.get('class', []) or 'nav' in div.get('id', []):
             log_change(div, 'nav')
 
     # Convert <b> tags to <strong>
@@ -62,15 +82,20 @@ def convert():
     return jsonify({"semantic": semantic_html, "changes": changes})
 
 def generate_explanation(original_tag, new_tag):
-    prompt = f"Explain why the HTML tag '{original_tag}' was changed to '{new_tag}' in a brief and clear way."
+    prompt = (
+        f"The HTML tag '{original_tag}' was changed to '{new_tag}'. "
+        f"Explain the purpose and specific function of the '{new_tag}' tag in HTML, including its impact on semantics, accessibility, and SEO. "
+        f"Provide a super brief and clear explanation."
+    )
     try:
-        # Call the OpenAI Completion API with gpt-4o-mini
-        response = openai.Completion.create(
-            engine="gpt-4o-mini",  # Use the GPT-4 Mini model
-            prompt=prompt,
-            max_tokens=50
+        explanation_completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=150
         )
-        return response.choices[0].text.strip()  # Extract the text from the response
+        return explanation_completion.choices[0].message.content.strip()
     except Exception as e:
         return f"Error generating explanation: {str(e)}"
 

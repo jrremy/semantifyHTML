@@ -1,3 +1,7 @@
+.input-form {
+  margin-bottom: 20px;
+}
+
 .url-container {
   flex-direction: column;
   align-items: center;
@@ -6,7 +10,7 @@
 .url-enter {
   display: flex;
   flex-direction: row;
-  gap: 5px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -27,15 +31,12 @@
   flex-direction: row;
   margin-top: 20px;
   align-items: center;
+  gap: 10px;
 }
 
 .convert-container button {
   width: 90px;
   height: 40px;
-}
-
-#convert-pulse-loader {
-  margin-left: 15px;
 }
 
 .import-file button {

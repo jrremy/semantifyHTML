@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 import "./Changes.css";
 
@@ -37,7 +38,7 @@ export default function Changes({ changes }) {
 
   return (
     <div className="changes">
-      <h3>Changes</h3>
+      <h2>Changes</h2>
       {/* <div className="change-boxes">
           {changes.map((change) => (
             <div key={change} className="change-box">
@@ -52,9 +53,12 @@ export default function Changes({ changes }) {
           {changes.length === 0 && <p>No changes found</p>}
           {changes.length > 0 && (
             <>
-              <p>Original Tag: {changes[currentChangeIndex].original_tag}</p>
-              <p>New Tag: {changes[currentChangeIndex].new_tag}</p>
-              <p>Content: {changes[currentChangeIndex].content}</p>
+              <h3>Original Tag</h3>
+              <pre>{changes[currentChangeIndex].original_tag}</pre>
+              <h3>New Tag</h3>
+              <pre>{changes[currentChangeIndex].new_tag}</pre>
+              {/* <p>New Tag: {changes[currentChangeIndex].new_tag}</p> */}
+              {/* <p>Content: {changes[currentChangeIndex].content}</p> */}
             </>
           )}
         </div>

@@ -26,7 +26,7 @@ export default function Output({ output, setShowChanges }) {
     <>
       <div className="output-box">
         <div className="output-header">
-          <h3>Converted Semantic HTML</h3>
+          <h2>Converted Semantic HTML</h2>
           <button id="copy-button" onClick={copyToClipboard}>
             <ContentCopyIcon fontSize="small" />
           </button>

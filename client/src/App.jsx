@@ -13,20 +13,31 @@ function App() {
   const [loadingConvert, setLoadingConvert] = useState(false);
   const [changes, setChanges] = useState([]);
   const [showChanges, setShowChanges] = useState(false);
+  const [noChanges, setNoChanges] = useState(false);
 
   const fetchSemanticHTML = async (inputHTML) => {
-    setLoadingConvert(true);
-    try {
-      const response = await axios.post("http://localhost:8080/convert", {
-        html: inputHTML,
-      });
-      setOutputHTML(response.data.semantic);
-      setChanges(response.data.changes);
-    } catch (error) {
-      console.error("Error fetching semantic HTML:", error);
-      alert("Error fetching semantic HTML.");
-    } finally {
-      setLoadingConvert(false); // Hide the loader once conversion is complete
+    if (inputHTML.length > 0) {
+      setNoChanges(false);
+      setLoadingConvert(true);
+      try {
+        const response = await axios.post("http://localhost:8080/convert", {
+          html: inputHTML,
+        });
+        setShowChanges(false);
+        if (response.data.changes.length > 0) {
+          setOutputHTML(response.data.semantic);
+          setChanges(response.data.changes);
+        } else {
+          setNoChanges(true);
+        }
+      } catch (error) {
+        console.error("Error fetching semantic HTML:", error);
+        alert("Error fetching semantic HTML.");
+      } finally {
+        setLoadingConvert(false); // Hide the loader once conversion is complete
+      }
+    } else {
+      setNoChanges(true);
     }
   };
 
@@ -50,11 +61,14 @@ function App() {
               <Input
                 onConvert={fetchSemanticHTML}
                 loadingConvert={loadingConvert}
+                noChanges={noChanges}
               />
             </div>
-            <div className="convert-section">
-              <Output output={outputHTML} setShowChanges={setShowChanges} />
-            </div>
+            {changes.length > 0 && !noChanges && (
+              <div className="convert-section">
+                <Output output={outputHTML} setShowChanges={setShowChanges} />
+              </div>
+            )}
             {showChanges && (
               <div className="convert-section">
                 <Changes changes={changes} />
