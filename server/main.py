@@ -39,10 +39,19 @@ def convert_to_semantic(html):
             new_tag_parts.append(f'id="{tag_id}"')
         new_tag_html = ' '.join(new_tag_parts) + '>'
 
-        changes.append({
-            'original_tag': original_tag_html,
-            'new_tag': new_tag_html,
-        })
+        # Check if this change already exists in the changes list
+        for change in changes:
+            if change['original_tag'] == original_tag_html and change['new_tag'] == new_tag_html:
+                # If it exists, increment the frequency
+                change['frequency'] += 1
+                break
+        else:
+            # If it doesn't exist, add it with a frequency of 1
+            changes.append({
+                'original_tag': original_tag_html,
+                'new_tag': new_tag_html,
+                'frequency': 1
+            })
         
         tag.name = new_name
 

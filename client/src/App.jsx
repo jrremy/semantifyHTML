@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
 import "./App.css";
@@ -14,6 +14,15 @@ function App() {
   const [changes, setChanges] = useState([]);
   const [showChanges, setShowChanges] = useState(false);
   const [noChanges, setNoChanges] = useState(false);
+
+  const changesSectionRef = useRef(null);
+  const outputSectionRef = useRef(null);
+
+  // useEffect(() => {
+  //   if (showChanges && changesSectionRef.current) {
+  //     changesSectionRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [showChanges]);
 
   const fetchSemanticHTML = async (inputHTML) => {
     if (inputHTML.length > 0) {
@@ -70,7 +79,7 @@ function App() {
               </div>
             )}
             {showChanges && (
-              <div className="convert-section">
+              <div className="convert-section" ref={changesSectionRef}>
                 <Changes changes={changes} />
               </div>
             )}

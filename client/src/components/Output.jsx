@@ -33,7 +33,9 @@ export default function Output({ output, setShowChanges }) {
           {copySuccess && <span className="copy-success">{copySuccess}</span>}
         </div>
         <textarea className="input-output" value={output} readOnly></textarea>
-        <button onClick={setShowChanges}>View Changes</button>
+        <button className="view-changes" onClick={setShowChanges}>
+          View Changes
+        </button>
       </div>
     </>
   );
