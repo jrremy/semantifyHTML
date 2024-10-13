@@ -42,3 +42,7 @@
 .import-file button {
   width: 20%px;
 }
+
+#no-changes-message {
+  margin: 0px;
+}

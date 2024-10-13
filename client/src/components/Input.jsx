@@ -121,7 +121,7 @@ export default function Input({ onConvert, loadingConvert, noChanges }) {
 
         <div className="convert-container">
           <button onClick={handleConvertButtonClick}>Convert</button>
-          {noChanges && <p>No Changes found.</p>}
+          {noChanges && <p id="no-changes-message">No changes found.</p>}
           <PulseLoader
             id="convert-pulse-loader"
             size={10}

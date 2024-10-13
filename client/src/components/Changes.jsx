@@ -11,20 +11,36 @@ export default function Changes({ changes }) {
     Array(changes.length).fill("")
   );
 
-  const fetchExplanation = async (changeIndex) => {
+  const fetchExplanationStream = async (changeIndex) => {
+    const change = changes[changeIndex];
+
     try {
-      const change = changes[changeIndex];
-      const response = await axios.post("http://localhost:8080/explanation", {
-        original_tag: change.original_tag,
-        new_tag: change.new_tag,
-        frequency: change.frequency,
+      const response = await fetch("http://localhost:8080/explanation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          original_tag: change.original_tag,
+          new_tag: change.new_tag,
+        }),
       });
-      const newExplanation = response.data.explanation;
-      setExplanations((prevExplanations) => {
-        const updatedExplanations = [...prevExplanations];
-        updatedExplanations[changeIndex] = newExplanation;
-        return updatedExplanations;
-      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      // Stream the data and update explanations as it comes in
+      let done = false;
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        const chunk = decoder.decode(value, { stream: true });
+        setExplanations((prevExplanations) => {
+          const updatedExplanations = [...prevExplanations];
+          updatedExplanations[changeIndex] += chunk;
+          return updatedExplanations;
+        });
+      }
     } catch (error) {
       console.error("Error generating explanation:", error);
       alert("Error generating explanation.");
@@ -42,15 +58,6 @@ export default function Changes({ changes }) {
   return (
     <div className="changes">
       <h2>Changes</h2>
-      {/* <div className="change-boxes">
-          {changes.map((change) => (
-            <div key={change} className="change-box">
-              <p>Original Tag: {change.original_tag}</p>
-              <p>New Tag: {change.new_tag}</p>
-              <p>Content: {change.content}</p>
-            </div>
-          ))}
-        </div> */}
       <div className="changes-container">
         <div className="change-box">
           {changes.length === 0 && <p>No changes found</p>}
@@ -74,7 +81,7 @@ export default function Changes({ changes }) {
           {explanations[currentChangeIndex] ? (
             <p>{explanations[currentChangeIndex]}</p>
           ) : (
-            <button onClick={() => fetchExplanation(currentChangeIndex)}>
+            <button onClick={() => fetchExplanationStream(currentChangeIndex)}>
               Generate Explanation
             </button>
           )}
@@ -83,19 +90,21 @@ export default function Changes({ changes }) {
 
       <nav class="changes-nav">
         <button
+          id="changes-prev"
           onClick={decrementChangeIndex}
           disabled={currentChangeIndex === 0}
         >
           <ArrowBackIosIcon></ArrowBackIosIcon>
-          Previous Change
+          Previous
         </button>
         <button
+          id="changes-next"
           onClick={incrementChangeIndex}
           disabled={
             (currentChangeIndex === changes.length - 1) | (changes.length === 0)
           }
         >
-          Next Change
+          Next
           <ArrowForwardIosIcon></ArrowForwardIosIcon>
         </button>
       </nav>

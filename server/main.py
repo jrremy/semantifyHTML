@@ -90,35 +90,41 @@ def convert():
     semantic_html, changes = convert_to_semantic(input_html)
     return jsonify({"semantic": semantic_html, "changes": changes})
 
-def generate_explanation(original_tag, new_tag):
-    prompt = (
-        f"The HTML tag '{original_tag}' was changed to '{new_tag}'. "
-        f"Explain the purpose and specific function of the '{new_tag}' tag in HTML, including its impact on semantics, accessibility, and SEO. "
-        f"Provide a super brief and clear explanation."
-    )
-    try:
-        explanation_completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=150
-        )
-        return explanation_completion.choices[0].message.content.strip()
-    except Exception as e:
-        return f"Error generating explanation: {str(e)}"
-
 @app.route('/explanation', methods=['POST'])
-def get_explanation():
+def generate_explanation():
     data = request.json
     original_tag = data.get('original_tag')
     new_tag = data.get('new_tag')
 
     if not original_tag or not new_tag:
         return jsonify({'error': 'Both original_tag and new_tag are required.'}), 400
-
-    explanation = generate_explanation(original_tag, new_tag)
-    return jsonify({'explanation': explanation})
+    
+    prompt = (
+        f"The HTML tag '{original_tag}' was changed to '{new_tag}'. "
+        f"Explain the purpose and specific function of the '{new_tag}' tag in HTML, including its impact on semantics, accessibility, and SEO. "
+        f"Provide a super brief and clear explanation."
+    )
+    
+    def generate():
+        try:
+            stream = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=150,
+                stream=True
+            )
+            
+            for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    yield(chunk.choices[0].delta.content)
+    
+        except Exception as e:
+            app.logger.error(f"Error during OpenAI request: {e}")
+            yield jsonify({'error': 'There was an error processing your request.'}), 500
+            
+    return generate(), {'Content-Type': 'text/plain'}
 
 def load_full_page_html(url):
     with sync_playwright() as p:

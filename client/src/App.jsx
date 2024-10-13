@@ -18,11 +18,14 @@ function App() {
   const changesSectionRef = useRef(null);
   const outputSectionRef = useRef(null);
 
-  // useEffect(() => {
-  //   if (showChanges && changesSectionRef.current) {
-  //     changesSectionRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [showChanges]);
+  useEffect(() => {
+    if (outputHTML.length > 0 && outputSectionRef.current) {
+      outputSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+    if (showChanges && changesSectionRef.current) {
+      changesSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [outputHTML.length > 0, showChanges]);
 
   const fetchSemanticHTML = async (inputHTML) => {
     if (inputHTML.length > 0) {
@@ -32,12 +35,13 @@ function App() {
         const response = await axios.post("http://localhost:8080/convert", {
           html: inputHTML,
         });
-        setShowChanges(false);
         if (response.data.changes.length > 0) {
           setOutputHTML(response.data.semantic);
+          setShowChanges(false);
           setChanges(response.data.changes);
         } else {
           setNoChanges(true);
+          setTimeout(() => setNoChanges(false), 2000);
         }
       } catch (error) {
         console.error("Error fetching semantic HTML:", error);
@@ -47,6 +51,7 @@ function App() {
       }
     } else {
       setNoChanges(true);
+      setTimeout(() => setNoChanges(false), 2000);
     }
   };
 
@@ -66,20 +71,20 @@ function App() {
           <div className="convert-page">
             <h2 id="slogan">Make your markup code more accessible!</h2>
 
-            <div className="convert-section">
+            <div className="page-section">
               <Input
                 onConvert={fetchSemanticHTML}
                 loadingConvert={loadingConvert}
                 noChanges={noChanges}
               />
             </div>
-            {changes.length > 0 && !noChanges && (
-              <div className="convert-section">
+            {changes.length > 0 && (
+              <div className="page-section" ref={outputSectionRef}>
                 <Output output={outputHTML} setShowChanges={setShowChanges} />
               </div>
             )}
             {showChanges && (
-              <div className="convert-section" ref={changesSectionRef}>
+              <div className="page-section" ref={changesSectionRef}>
                 <Changes changes={changes} />
               </div>
             )}
