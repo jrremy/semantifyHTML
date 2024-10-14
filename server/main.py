@@ -102,7 +102,7 @@ def generate_explanation():
     prompt = (
         f"The HTML tag '{original_tag}' was changed to '{new_tag}'. "
         f"Explain the purpose and specific function of the '{new_tag}' tag in HTML, including its impact on semantics, accessibility, and SEO. "
-        f"Provide a super brief and clear explanation."
+        f"Provide a concise and clear explanation, no more than a couple complete sentences."
     )
     
     def generate():

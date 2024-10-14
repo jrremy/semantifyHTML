@@ -68,69 +68,67 @@ export default function Input({ onConvert, loadingConvert, noChanges }) {
   const inputModes = ["Paste HTML", "Paste URL", "Import File"];
 
   return (
-    <>
-      <div className="input-box">
-        <h2>Input HTML</h2>
-        <ModeMenu
-          modes={inputModes}
-          activeMode={inputMode}
-          onSwitch={handleModeButtonClick}
-        ></ModeMenu>
-        <div className="input-form">
-          {inputMode === "Paste URL" && (
-            <>
-              <div className="url-container">
-                <div className="url-enter">
-                  <input
-                    placeholder="Enter a URL to extract HTML from"
-                    value={inputURL}
-                    onChange={handleURLInputChange}
-                  ></input>
-                  <button onClick={handleLoadButtonClick}>Load</button>
-                </div>
-                <PulseLoader
-                  id="url-pulse-loader"
-                  size={10}
-                  color="white"
-                  speedMultiplier={1.5}
-                  loading={loadingURL}
-                />
-              </div>
-            </>
-          )}
-          {inputMode === "Import File" && (
-            <>
-              <div className="import-file">
+    <div className="input-box">
+      <h2>Input HTML</h2>
+      <ModeMenu
+        modes={inputModes}
+        activeMode={inputMode}
+        onSwitch={handleModeButtonClick}
+      ></ModeMenu>
+      <div className="input-form">
+        {inputMode === "Paste URL" && (
+          <>
+            <div className="url-container">
+              <div className="url-enter">
                 <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={handleFileChange}
+                  placeholder="Enter a URL to extract HTML from"
+                  value={inputURL}
+                  onChange={handleURLInputChange}
                 ></input>
-                <button onClick={handleFileButton}>Choose File</button>
+                <button onClick={handleLoadButtonClick}>Load</button>
               </div>
-            </>
-          )}
-        </div>
-        <textarea
-          className="input-output"
-          value={inputHTML}
-          onChange={handleHTMLInputChange}
-          placeholder="Enter Your HTML"
-        ></textarea>
-
-        <div className="convert-container">
-          <button onClick={handleConvertButtonClick}>Convert</button>
-          {noChanges && <p id="no-changes-message">No changes found.</p>}
-          <PulseLoader
-            id="convert-pulse-loader"
-            size={10}
-            color="white"
-            speedMultiplier={1.5}
-            loading={loadingConvert}
-          />
-        </div>
+              <PulseLoader
+                id="url-pulse-loader"
+                size={10}
+                color="white"
+                speedMultiplier={1.5}
+                loading={loadingURL}
+              />
+            </div>
+          </>
+        )}
+        {inputMode === "Import File" && (
+          <>
+            <div className="import-file">
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              ></input>
+              <button onClick={handleFileButton}>Choose File</button>
+            </div>
+          </>
+        )}
       </div>
-    </>
+      <textarea
+        className="input-output"
+        value={inputHTML}
+        onChange={handleHTMLInputChange}
+        placeholder="Enter Your HTML"
+      ></textarea>
+
+      <div className="convert-container">
+        <button onClick={handleConvertButtonClick}>Convert</button>
+        {noChanges && <p id="no-changes-message">No changes found.</p>}
+        <PulseLoader
+          id="convert-pulse-loader"
+          size={10}
+          color="white"
+          speedMultiplier={1.5}
+          loading={loadingConvert}
+        />
+      </div>
+    </div>
   );
 }

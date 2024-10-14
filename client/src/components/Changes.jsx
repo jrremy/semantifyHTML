@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 import "./Changes.css";
 
@@ -81,7 +81,11 @@ export default function Changes({ changes }) {
           {explanations[currentChangeIndex] ? (
             <p>{explanations[currentChangeIndex]}</p>
           ) : (
-            <button onClick={() => fetchExplanationStream(currentChangeIndex)}>
+            <button
+              id="generate-explanation"
+              onClick={() => fetchExplanationStream(currentChangeIndex)}
+            >
+              <AutoAwesomeIcon />
               Generate Explanation
             </button>
           )}

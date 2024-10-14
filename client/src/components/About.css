@@ -1,0 +1,9 @@
+.about-section {
+  width: 700px;
+}
+
+.about-section p {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}

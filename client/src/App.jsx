@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar.jsx";
 import Input from "./components/Input.jsx";
 import Output from "./components/Output.jsx";
 import Changes from "./components/Changes.jsx";
+import About from "./components/About.jsx";
 
 function App() {
   const [activeTab, setActiveTab] = useState("Convert");
@@ -67,30 +68,36 @@ function App() {
         ></Navbar>
       </header>
       <main>
-        {activeTab === "Convert" && (
-          <div className="convert-page">
-            <h2 id="slogan">Make your markup code more accessible!</h2>
+        <div className="page-content">
+          {activeTab === "Convert" && (
+            <>
+              <h2 id="slogan">Make your markup code more accessible!</h2>
 
+              <div className="page-section">
+                <Input
+                  onConvert={fetchSemanticHTML}
+                  loadingConvert={loadingConvert}
+                  noChanges={noChanges}
+                />
+              </div>
+              {changes.length > 0 && (
+                <div className="page-section" ref={outputSectionRef}>
+                  <Output output={outputHTML} setShowChanges={setShowChanges} />
+                </div>
+              )}
+              {showChanges && (
+                <div className="page-section" ref={changesSectionRef}>
+                  <Changes changes={changes} />
+                </div>
+              )}
+            </>
+          )}
+          {activeTab === "About" && (
             <div className="page-section">
-              <Input
-                onConvert={fetchSemanticHTML}
-                loadingConvert={loadingConvert}
-                noChanges={noChanges}
-              />
+              <About />
             </div>
-            {changes.length > 0 && (
-              <div className="page-section" ref={outputSectionRef}>
-                <Output output={outputHTML} setShowChanges={setShowChanges} />
-              </div>
-            )}
-            {showChanges && (
-              <div className="page-section" ref={changesSectionRef}>
-                <Changes changes={changes} />
-              </div>
-            )}
-          </div>
-        )}
-        {activeTab === "About" && <p>About section text</p>}
+          )}
+        </div>
       </main>
     </>
   );
