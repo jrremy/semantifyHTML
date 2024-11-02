@@ -14,30 +14,113 @@ This project is a web tool that aims to enhance the semantic quality of HTML cod
 
 ## Dependencies
 
+### Prerequisites
+
+Make sure you have the following installed:
+
+- [Python] (version 3.7 or higher)
+- [Node.js] (version 14 or higher)
+
 ### Backend
 
-The backend of this project is built with Python and Flask, and relies on the following key dependencies:
-
-- **Python**: Required to run the backend code. Make sure you have Python installed (preferably Python 3.8 or later).
-- **Flask (3.0.3)**: A lightweight web framework used to build the backend server and handle HTTP requests.
-- **Flask_Cors (4.0.1)**: Provides Cross-Origin Resource Sharing (CORS) support, allowing the frontend to securely communicate with the backend.
-- **BeautifulSoup4 (4.12.3)**: Parses and navigates HTML content, enabling semantic analysis and transformation.
-- **OpenAI (1.51.2)**: Used for natural language processing and other AI-driven tasks, enhancing the semantic analysis process.
-- **Playwright (1.46.0)**: Facilitates headless browsing, which can be useful for dynamically loading and scraping HTML content.
-- **Requests (2.32.3)**: Handles HTTP requests, allowing the backend to fetch HTML content from URLs provided by users.
+- **Python**
+- **Flask (3.0.3)**
+- **Flask_Cors (4.0.1)**
+- **BeautifulSoup4 (4.12.3)**
+- **OpenAI (1.51.2)**
+- **Playwright (1.46.0)**
+- **Requests (2.32.3)**
+- **Redis (5.2.0)**
 
 ### Frontend
 
-The frontend is a React application bootstrapped with Vite, with dependencies focused on UI and state management:
-
-- **React (18.3.1) and React DOM (18.3.1)**: Core libraries for building and rendering the UI components.
-- **@mui/material (6.0.2) and @mui/icons-material (6.0.2)**: Material UI components and icons for a clean, responsive interface.
-- **@emotion/react (11.13.3) and @emotion/styled (11.13.0)**: Provides powerful CSS-in-JS styling capabilities for a dynamic and customizable UI.
-- **Axios (1.7.2)**: A promise-based HTTP client used to send requests from the frontend to the backend API.
-- **React Spinners (0.14.1)**: A loading spinner component library, improving user experience during API calls.
+- **React (18.3.1) and React DOM (18.3.1)**
+- **@mui/material (6.0.2) and @mui/icons-material (6.0.2)**
+- **@emotion/react (11.13.3) and @emotion/styled (11.13.0)**
+- **Axios (1.7.2)**
+- **React Spinners (0.14.1)**
 
 ### Development Dependencies
 
-- **Vite (5.3.4)**: A fast frontend build tool that provides a streamlined development experience with fast module replacement.
-- **ESLint (8.57.0)** and plugins: Used for code quality and consistency, ensuring adherence to best practices.
-- **@vitejs/plugin-react (4.3.1)**: Adds support for React fast-refresh and JSX transformation, enhancing the development workflow.
+- **Vite (5.3.4)**
+- **ESLint (8.57.0)** and plugins
+- **@vitejs/plugin-react (4.3.1)**
+
+## How to Install and Run
+
+### Backend
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/jrremy/semantifyHTML
+   cd semantifyHTML
+   ```
+
+2. **Create a virtual environment**:
+
+   ```bash
+   python -m venv venv
+   ```
+
+3. **Activate the virtual environment**:
+
+   - On Windows:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - On macOS/Linux:
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. **Install the backend dependencies**:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Set the OpenAI API key (optional)**:
+   You can set an environment variable for your OpenAI API key if you wish to use the explanation feature. In your terminal, run:
+
+   - On Windows:
+     ```bash
+     set OPENAI_API_KEY=your_api_key_here
+     ```
+   - On macOS/Linux:
+     ```bash
+     export OPENAI_API_KEY=your_api_key_here
+     ```
+
+6. **Run Redis server (optional)**:
+   If you want to use Redis for optimized explanations, make sure Redis is installed on your machine and run:
+
+   ```bash
+   redis-server
+   ```
+
+7. **Run the Flask backend**:
+   ```bash
+   python app.py
+   ```
+
+### Frontend
+
+1. **Navigate to the client directory**:
+
+   ```bash
+   cd client
+   ```
+
+2. **Install the frontend dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Run the Vite development server**:
+   ```bash
+   npm run dev
+   ```
+
+Now you should have both the backend and frontend running. Access the frontend through your web browser at `http://localhost:3000` and the backend at `http://localhost:8080`.
