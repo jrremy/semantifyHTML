@@ -54,7 +54,7 @@ Make sure you have the following installed:
 
    ```bash
    git clone https://github.com/jrremy/semantifyHTML
-   cd semantifyHTML
+   cd semantifyHTML/server
    ```
 
 2. **Create a virtual environment**:
