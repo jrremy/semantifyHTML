@@ -5,14 +5,26 @@ from bs4 import BeautifulSoup
 import requests
 from playwright.sync_api import sync_playwright
 from openai import OpenAI
-
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
+import redis
 
 app = Flask(__name__)
 cors = CORS(app, origins='*')
+
+# OpenAI setup to allow the option for AI-generated explanations for each HTML modification
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
+
+# Redis setup for caching AI-generated explanations
+redis_client = None
+redis_available = True
+
+try:
+    redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+    # Test the connection
+    redis_client.ping()
+except (redis.ConnectionError, redis.TimeoutError):
+    redis_available = False
 
 def convert_to_semantic(html):
     soup = BeautifulSoup(html, 'html.parser')
@@ -98,33 +110,43 @@ def generate_explanation():
 
     if not original_tag or not new_tag:
         return jsonify({'error': 'Both original_tag and new_tag are required.'}), 400
-    
+
+    # If Redis is running, check if a cached explanation exists
+    if redis_available:
+        cache_key = f"{original_tag}:{new_tag}"
+        cached_explanation = redis_client.get(cache_key)
+        
+        if cached_explanation:
+            return jsonify({"explanation": cached_explanation.decode('utf-8')})
+
     prompt = (
         f"The HTML tag '{original_tag}' was changed to '{new_tag}'. "
         f"Explain the purpose and specific function of the '{new_tag}' tag in HTML, including its impact on semantics, accessibility, and SEO. "
         f"Provide a concise and clear explanation, no more than a couple complete sentences."
     )
-    
+
     def generate():
         try:
             stream = client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 max_tokens=150,
                 stream=True
             )
-            
             for chunk in stream:
                 if chunk.choices[0].delta.content is not None:
                     yield(chunk.choices[0].delta.content)
-    
         except Exception as e:
             app.logger.error(f"Error during OpenAI request: {e}")
             yield jsonify({'error': 'There was an error processing your request.'}), 500
-            
-    return generate(), {'Content-Type': 'text/plain'}
+    
+    explanation = generate()
+    
+    # Cache the explanation in Redis if it's running
+    if redis_available:
+        redis_client.set(cache_key, explanation)
+
+    return explanation, {'Content-Type': 'text/plain'}
 
 def load_full_page_html(url):
     with sync_playwright() as p:
