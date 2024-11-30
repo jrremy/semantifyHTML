@@ -11,9 +11,16 @@ app = Flask(__name__)
 cors = CORS(app, origins='*')
 
 # OpenAI setup to allow the option for AI-generated explanations for each HTML modification
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+openai_client = None
+
+if openai_api_key:
+    try:
+        openai_client = OpenAI(api_key=openai_api_key)
+    except Exception as e:
+        print(f"Error initializing OpenAI client: {e}")
+else:
+    print("OpenAI API key is missing, OpenAI-related features will be unavailable.")
 
 # Redis setup for caching AI-generated explanations
 redis_client = None
@@ -127,7 +134,7 @@ def generate_explanation():
 
     def generate():
         try:
-            stream = client.chat.completions.create(
+            stream = openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=150,

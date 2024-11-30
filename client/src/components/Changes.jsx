@@ -43,7 +43,7 @@ export default function Changes({ changes }) {
       }
     } catch (error) {
       console.error("Error generating explanation:", error);
-      alert("Error generating explanation.");
+      alert("Error generating explanation. Make sure your OpenAI API key has been set up.");
     }
   };
 
