@@ -1,7 +1,6 @@
 from openai import OpenAI
 from typing import Optional
 import redis
-from flask import jsonify
 
 def generate_explanation_stream(original_tag: str, new_tag: str, openai_client: Optional[OpenAI], redis_client: Optional[redis.StrictRedis], redis_available: bool):
     """
