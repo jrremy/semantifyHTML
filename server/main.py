@@ -27,7 +27,7 @@ redis_client = None
 redis_available = True
 
 try:
-    redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+    redis_client = redis.Redis(host='localhost', port=6379, db=0)
     # Test the connection
     redis_client.ping()
 except (redis.ConnectionError, redis.TimeoutError):
@@ -48,7 +48,6 @@ def generate_explanation() -> Response:
     if not original_tag or not new_tag:
         return jsonify({'error': 'Both original_tag and new_tag are required.'}), 400
 
-    # Use the function from explanation.py to generate and stream the explanation
     explanation_stream = explanation.generate_explanation_stream(
         original_tag, new_tag, openai_client, redis_client, redis_available
     )
