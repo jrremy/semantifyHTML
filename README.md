@@ -12,6 +12,10 @@ This project is a web tool that aims to enhance the semantic quality of HTML cod
 
 - **SEO Optimization**: Analyzes and adjusts HTML elements to improve discoverability by search engines.
 
+## Motivation
+
+- I heavily value accessibility. I've seen firsthand how impactful tools like screen readers and magnifiers are, since I've used these tools myself. When I first learned about web development, I came across an interesting fact when exploring HTML: a lot of the tags you use may not make a visual difference on the page, but play a crucial role in the backend. These elements, such as <header>, <article>, and <details> are referred to as semantic. They're responsible for letting the browser and search engine know what their purpose is, and can provide more details to something like a screen reader. Just simply adding an alternative description for an image can tell a visually impaired person what's on their screen. With this knowledge, I decided to make my first full-stack project about something I feel strongly about: teaching others about these little changes and their importance.
+
 ## Dependencies
 
 ### Prerequisites
