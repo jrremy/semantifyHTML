@@ -1,4 +1,5 @@
 import os
+import logging
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from openai import OpenAI
@@ -6,6 +7,13 @@ import redis
 from typing import Optional
 
 import parse_html, explanation
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 cors = CORS(app, origins='*')
@@ -17,51 +25,92 @@ openai_client: Optional[OpenAI] = None
 if openai_api_key:
     try:
         openai_client = OpenAI(api_key=openai_api_key)
+        # Test the connection
+        openai_client.models.list()
+        logger.info("OpenAI client initialized successfully")
     except Exception as e:
-        print(f"Error initializing OpenAI client: {e}")
+        logger.error(f"Error initializing OpenAI client: {e}")
+        openai_client = None
 else:
-    print("OpenAI API key is missing, OpenAI-related features will be unavailable.")
+    logger.warning("OpenAI API key is missing, OpenAI-related features will be unavailable.")
 
 # Redis setup for caching AI-generated explanations
 redis_client = None
-redis_available = True
+redis_available = False
 
 try:
-    redis_client = redis.Redis(host='localhost', port=6379, db=0)
+    redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
     # Test the connection
     redis_client.ping()
-except (redis.ConnectionError, redis.TimeoutError):
+    redis_available = True
+    logger.info("Redis connection established successfully")
+except (redis.ConnectionError, redis.TimeoutError) as e:
+    logger.warning(f"Redis connection failed: {e}")
+    redis_available = False
+except Exception as e:
+    logger.error(f"Unexpected Redis error: {e}")
     redis_available = False
 
 @app.route("/convert", methods=['POST'])
 def convert() -> Response:
-    input_html = request.json.get('html', '')
-    semantic_html, changes = parse_html.convert_to_semantic(input_html)
-    return jsonify({"semantic": semantic_html, "changes": changes})
+    try:
+        input_html = request.json.get('html', '')
+        if not input_html:
+            return jsonify({"error": "No HTML content provided"}), 400
+            
+        semantic_html, changes = parse_html.convert_to_semantic(input_html)
+        logger.info(f"Converted HTML with {len(changes)} changes")
+        return jsonify({"semantic": semantic_html, "changes": changes})
+    except Exception as e:
+        logger.error(f"Error in convert endpoint: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/explanation', methods=['POST'])
 def generate_explanation() -> Response:
-    data: dict = request.json
-    original_tag: str = data.get('original_tag')
-    new_tag: str = data.get('new_tag')
+    try:
+        data: dict = request.json
+        original_tag: str = data.get('original_tag')
+        new_tag: str = data.get('new_tag')
 
-    if not original_tag or not new_tag:
-        return jsonify({'error': 'Both original_tag and new_tag are required.'}), 400
+        if not original_tag or not new_tag:
+            return jsonify({'error': 'Both original_tag and new_tag are required.'}), 400
 
-    explanation_stream = explanation.generate_explanation_stream(
-        original_tag, new_tag, openai_client, redis_client, redis_available
-    )
+        logger.info(f"Generating explanation for {original_tag} -> {new_tag}")
+        
+        explanation_stream = explanation.generate_explanation_stream(
+            original_tag, new_tag, openai_client, redis_client, redis_available
+        )
 
-    return Response(explanation_stream, content_type='text/plain')
+        return Response(explanation_stream, content_type='text/plain')
+    except Exception as e:
+        logger.error(f"Error in explanation endpoint: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route("/load", methods=['POST'])
 def load_url() -> Response:
-    url: str = request.json.get('url', '')
     try:
+        url: str = request.json.get('url', '')
+        if not url:
+            return jsonify({"error": "No URL provided"}), 400
+            
+        logger.info(f"Loading HTML from URL: {url}")
         html_content = parse_html.load_full_page_html(url)
         return jsonify({"content": html_content})
     except Exception as e:
+        logger.error(f"Error loading URL {url}: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route("/health", methods=['GET'])
+def health_check() -> Response:
+    """Health check endpoint to verify service status"""
+    status = {
+        "status": "healthy",
+        "openai_available": openai_client is not None,
+        "redis_available": redis_available,
+        "timestamp": logging.Formatter().formatTime(logging.LogRecord("", 0, "", 0, "", (), None))
+    }
+    return jsonify(status)
+
 if __name__ == "__main__":
+    logger.info("Starting SemantifyHTML server...")
     app.run(debug=True, port=8080)

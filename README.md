@@ -28,13 +28,13 @@ Make sure you have the following installed:
 ### Backend
 
 - **Python**
-- **Flask (3.0.3)**
-- **Flask_Cors (4.0.1)**
-- **BeautifulSoup4 (4.12.3)**
-- **OpenAI (1.51.2)**
+- **Flask (3.1.2)**
+- **Flask_Cors (6.0.1)**
+- **BeautifulSoup4 (4.13.4)**
+- **OpenAI (1.101.0)**
 - **Playwright (1.46.0)**
-- **Requests (2.32.3)**
-- **Redis (5.2.0)**
+- **Requests (2.32.5)**
+- **Redis (6.4.0)**
 
 ### Frontend
 
