@@ -1,12 +1,38 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from playwright.sync_api import sync_playwright
+from typing import List, Dict, Any, Tuple
 
 
-def convert_to_semantic(html):
+def convert_to_semantic(html: str) -> Tuple[str, List[Dict[str, Any]]]:
+    """
+    Convert HTML to semantic HTML by replacing non-semantic tags with semantic alternatives.
+
+    This function processes HTML content and performs the following conversions:
+    - Replaces div elements with semantic tags based on class/id attributes
+    - Converts <b> tags to <strong>
+    - Converts <i> tags to <em>
+    - Converts <span> tags with 'block' class to <p>
+    - Ensures all <img> tags have alt attributes
+
+    Args:
+        html: The input HTML string to convert
+
+    Returns:
+        Tuple containing:
+            - modified_html: The converted semantic HTML string
+            - changes: List of dictionaries describing each change made
+    """
     soup = BeautifulSoup(html, "html.parser")
-    changes = []
+    changes: List[Dict[str, Any]] = []
 
-    def log_change(tag, new_name):
+    def log_change(tag: Tag, new_name: str) -> None:
+        """
+        Log a tag conversion change and update the tag name.
+
+        Args:
+            tag: The BeautifulSoup Tag object to modify
+            new_name: The new tag name to assign
+        """
         # Get classes and id, if available
         classes = " ".join(tag.get("class", []))
         tag_id = tag.get("id", "")
@@ -106,6 +132,22 @@ def convert_to_semantic(html):
 
 
 def load_full_page_html(url: str) -> str:
+    """
+    Load the full HTML content of a webpage using Playwright.
+
+    This function launches a headless browser, navigates to the specified URL,
+    waits for the page to fully load, and returns the rendered HTML content.
+
+    Args:
+        url: The URL of the webpage to load
+
+    Returns:
+        The prettified HTML content of the webpage
+
+    Note:
+        This function requires Playwright to be installed and configured.
+        The browser runs in headless mode for server environments.
+    """
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Launch headless browser
         page = browser.new_page()

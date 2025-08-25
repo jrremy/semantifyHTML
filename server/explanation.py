@@ -7,6 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def generate_explanation_stream(
     original_tag: str, 
     new_tag: str, 
@@ -15,18 +16,25 @@ def generate_explanation_stream(
     redis_available: bool
 ) -> Generator[str, None, None]:
     """
-    Generates an explanation for the change from original_tag to new_tag.
+    Generate an explanation for the change from original_tag to new_tag.
+    
     Streams the explanation to the client and caches it in Redis if available.
+    The function first checks Redis cache for existing explanations before
+    generating new ones using OpenAI's API.
     
     Args:
         original_tag: The original HTML tag that was changed
         new_tag: The new semantic HTML tag
-        openai_client: OpenAI client instance
-        redis_client: Redis client instance for caching
+        openai_client: OpenAI client instance for generating explanations
+        redis_client: Redis client instance for caching explanations
         redis_available: Whether Redis is available for caching
         
     Yields:
         str: Chunks of the explanation as they are generated
+        
+    Note:
+        If OpenAI client is not available, returns an error message.
+        If Redis caching fails, continues without caching but logs warnings.
     """
     
     if not openai_client:
