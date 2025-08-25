@@ -43,7 +43,9 @@ export default function Changes({ changes }) {
       }
     } catch (error) {
       console.error("Error generating explanation:", error);
-      alert("Error generating explanation. Make sure your OpenAI API key has been set up.");
+      alert(
+        "Error generating explanation. Make sure your OpenAI API key has been set up."
+      );
     }
   };
 
@@ -77,7 +79,11 @@ export default function Changes({ changes }) {
             </>
           )}
         </div>
-        <div className="explanation-box">
+        <div
+          className={`explanation-box ${
+            explanations[currentChangeIndex] ? "has-explanation" : ""
+          }`}
+        >
           {explanations[currentChangeIndex] ? (
             <p>{explanations[currentChangeIndex]}</p>
           ) : (

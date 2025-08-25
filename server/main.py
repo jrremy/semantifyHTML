@@ -38,12 +38,16 @@ else:
 redis_client = None
 redis_available = False
 
+# Get Redis configuration from environment variables
+redis_host = os.environ.get("REDIS_HOST", "localhost")
+redis_port = int(os.environ.get("REDIS_PORT", 6379))
+
 try:
-    redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    redis_client = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True)
     # Test the connection
     redis_client.ping()
     redis_available = True
-    logger.info("Redis connection established successfully")
+    logger.info(f"Redis connection established successfully at {redis_host}:{redis_port}")
 except (redis.ConnectionError, redis.TimeoutError) as e:
     logger.warning(f"Redis connection failed: {e}")
     redis_available = False
@@ -113,4 +117,4 @@ def health_check() -> Response:
 
 if __name__ == "__main__":
     logger.info("Starting SemantifyHTML server...")
-    app.run(debug=True, port=8080)
+    app.run(host="0.0.0.0", port=8080, debug=False)

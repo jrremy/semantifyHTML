@@ -56,6 +56,12 @@
   white-space: pre-wrap;
 }
 
+/* When there's explanation text, align it to the top-left */
+.explanation-box.has-explanation {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
 .explanation-box p {
   margin: 0;
   padding: 0;

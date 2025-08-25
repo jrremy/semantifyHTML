@@ -1,0 +1,66 @@
+services:
+  # Redis for caching AI explanations
+  redis:
+    image: redis:7-alpine
+    container_name: semantifyhtml-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Flask backend with Playwright
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: semantifyhtml-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./server:/app
+    networks:
+      - semantifyhtml-network
+    # Recommended Docker configuration for Playwright
+    init: true
+    ipc: host
+    # For development, you can add this capability if needed
+    # cap_add:
+    #   - SYS_ADMIN
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: semantifyhtml-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - semantifyhtml-network
+
+volumes:
+  redis_data:
+
+networks:
+  semantifyhtml-network:
+    driver: bridge
