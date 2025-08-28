@@ -9,38 +9,38 @@ logger = logging.getLogger(__name__)
 
 
 def generate_explanation_stream(
-    original_tag: str, 
-    new_tag: str, 
-    openai_client: Optional[OpenAI], 
-    redis_client: Optional[redis.Redis], 
-    redis_available: bool
+    original_tag: str,
+    new_tag: str,
+    openai_client: Optional[OpenAI],
+    redis_client: Optional[redis.Redis],
+    redis_available: bool,
 ) -> Generator[str, None, None]:
     """
     Generate an explanation for the change from original_tag to new_tag.
-    
+
     Streams the explanation to the client and caches it in Redis if available.
     The function first checks Redis cache for existing explanations before
     generating new ones using OpenAI's API.
-    
+
     Args:
         original_tag: The original HTML tag that was changed
         new_tag: The new semantic HTML tag
         openai_client: OpenAI client instance for generating explanations
         redis_client: Redis client instance for caching explanations
         redis_available: Whether Redis is available for caching
-        
+
     Yields:
         str: Chunks of the explanation as they are generated
-        
+
     Note:
         If OpenAI client is not available, returns an error message.
         If Redis caching fails, continues without caching but logs warnings.
     """
-    
+
     if not openai_client:
         yield "Error: OpenAI client not available. Please check your API key configuration."
         return
-    
+
     # Specific prompt focusing on the individual tag's purpose
     prompt = f"""The HTML tag '{original_tag}' was changed to '{new_tag}'.
 
@@ -55,7 +55,8 @@ Keep it concise (2-3 sentences max) and avoid generic statements about semantic 
             cached_explanation = redis_client.get(cache_key)
             if cached_explanation:
                 logger.info(f"Cache hit for {cache_key}")
-                yield cached_explanation.decode('utf-8')
+                # Redis client is configured with decode_responses=True, so no need to decode
+                yield cached_explanation
                 return
         except Exception as e:
             logger.warning(f"Redis cache error: {e}")
@@ -64,26 +65,29 @@ Keep it concise (2-3 sentences max) and avoid generic statements about semantic 
     try:
         # Try to use the latest model, fallback to older ones if needed
         models_to_try = [
-            "gpt-4o-mini",         # Latest and most cost-effective
+            "gpt-4o-mini",  # Latest and most cost-effective
             "gpt-3.5-turbo-0125",  # Latest 3.5 model
-            "gpt-3.5-turbo"        # Fallback
+            "gpt-3.5-turbo",  # Fallback
         ]
-        
+
         stream = None
         used_model = None
-        
+
         for model in models_to_try:
             try:
                 logger.info(f"Attempting to use model: {model}")
                 stream = openai_client.chat.completions.create(
                     model=model,
                     messages=[
-                        {"role": "system", "content": "You provide specific, tag-focused explanations. Avoid generic statements about semantic HTML benefits. Focus on what each tag uniquely does and why it's better than a div for that specific content."},
-                        {"role": "user", "content": prompt}
+                        {
+                            "role": "system",
+                            "content": "You provide specific, tag-focused explanations. Avoid generic statements about semantic HTML benefits. Focus on what each tag uniquely does and why it's better than a div for that specific content.",
+                        },
+                        {"role": "user", "content": prompt},
                     ],
                     max_tokens=150,  # Increased to ensure complete explanations
-                    temperature=0.3, # Balanced temperature for good responses
-                    stream=True
+                    temperature=0.3,  # Balanced temperature for good responses
+                    stream=True,
                 )
                 used_model = model
                 logger.info(f"Successfully using model: {model}")
@@ -91,15 +95,15 @@ Keep it concise (2-3 sentences max) and avoid generic statements about semantic 
             except Exception as e:
                 logger.warning(f"Failed to use model {model}: {e}")
                 continue
-        
+
         if not stream:
             yield "Error: Unable to connect to OpenAI API. Please check your API key and internet connection."
             return
-        
+
         # Stream explanation as chunks and collect full response for caching
         full_explanation = ""
         chunk_count = 0
-        
+
         for chunk in stream:
             if chunk.choices[0].delta.content is not None:
                 content = chunk.choices[0].delta.content
@@ -112,7 +116,9 @@ Keep it concise (2-3 sentences max) and avoid generic statements about semantic 
             try:
                 # Cache for 24 hours (86400 seconds)
                 redis_client.setex(cache_key, 86400, full_explanation)
-                logger.info(f"Cached explanation for {cache_key} using model {used_model}")
+                logger.info(
+                    f"Cached explanation for {cache_key} using model {used_model}"
+                )
             except Exception as e:
                 logger.warning(f"Failed to cache explanation: {e}")
 

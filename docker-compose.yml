@@ -8,11 +8,15 @@ services:
     volumes:
       - redis_data:/data
     restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - semantifyhtml-network
 
   # Flask backend with Playwright
   backend:
@@ -27,6 +31,8 @@ services:
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_PORT=${REDIS_PORT:-6379}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - REDIS_CONNECT_TIMEOUT=10
+      - REDIS_RETRY_ON_TIMEOUT=true
     depends_on:
       redis:
         condition: service_healthy

@@ -44,22 +44,40 @@ redis_available: bool = False
 redis_host: str = os.environ.get("REDIS_HOST", "localhost")
 redis_port: int = int(os.environ.get("REDIS_PORT", 6379))
 
-try:
-    redis_client = redis.Redis(
-        host=redis_host, port=redis_port, db=0, decode_responses=True
-    )
-    # Test the connection
-    redis_client.ping()
-    redis_available = True
-    logger.info(
-        f"Redis connection established successfully at {redis_host}:{redis_port}"
-    )
-except (redis.ConnectionError, redis.TimeoutError) as e:
-    logger.warning(f"Redis connection failed: {e}")
-    redis_available = False
-except Exception as e:
-    logger.error(f"Unexpected Redis error: {e}")
-    redis_available = False
+
+def try_redis_connection():
+    """Try to establish Redis connection with retry logic."""
+    global redis_client, redis_available
+
+    try:
+        redis_client = redis.Redis(
+            host=redis_host,
+            port=redis_port,
+            db=0,
+            decode_responses=True,
+            socket_connect_timeout=10,
+            socket_timeout=10,
+            retry_on_timeout=True,
+        )
+        # Test the connection
+        redis_client.ping()
+        redis_available = True
+        logger.info(
+            f"Redis connection established successfully at {redis_host}:{redis_port}"
+        )
+        return True
+    except (redis.ConnectionError, redis.TimeoutError) as e:
+        logger.warning(f"Redis connection failed: {e}")
+        redis_available = False
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected Redis error: {e}")
+        redis_available = False
+        return False
+
+
+# Try initial Redis connection
+try_redis_connection()
 
 
 @app.route("/convert", methods=["POST"])
@@ -158,6 +176,10 @@ def health_check() -> Response:
             - redis_available: Whether Redis connection is available
             - timestamp: Current timestamp
     """
+    # Try to reconnect to Redis if it's not available
+    if not redis_available:
+        try_redis_connection()
+
     status = {
         "status": "healthy",
         "openai_available": openai_client is not None,
@@ -167,6 +189,58 @@ def health_check() -> Response:
         ),
     }
     return jsonify(status)
+
+
+@app.route("/redis-test", methods=["GET"])
+def test_redis() -> Response:
+    """
+    Test Redis connection and caching functionality.
+
+    Returns:
+        JSON response with Redis test results
+    """
+    if not redis_available:
+        return jsonify({"error": "Redis not available"}), 503
+
+    try:
+        # Test basic operations
+        test_key = "test:cache:ping"
+        test_value = "pong"
+
+        # Set a test value
+        redis_client.setex(test_key, 60, test_value)
+
+        # Get the test value
+        retrieved_value = redis_client.get(test_key)
+
+        # Delete the test value
+        redis_client.delete(test_key)
+
+        if retrieved_value == test_value:
+            return jsonify(
+                {
+                    "status": "success",
+                    "message": "Redis is working correctly",
+                    "test_key": test_key,
+                    "test_value": test_value,
+                    "retrieved_value": retrieved_value,
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "Redis read/write test failed",
+                    "expected": test_value,
+                    "got": retrieved_value,
+                }
+            ), 500
+
+    except Exception as e:
+        logger.error(f"Redis test failed: {e}")
+        return jsonify(
+            {"status": "error", "message": f"Redis test failed: {str(e)}"}
+        ), 500
 
 
 if __name__ == "__main__":
