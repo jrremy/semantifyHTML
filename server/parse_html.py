@@ -84,6 +84,8 @@ def convert_to_semantic(html: str) -> Tuple[str, List[Dict[str, Any]]]:
             log_change(div, "main")
         elif "nav" in div.get("class", []) or "nav" in div.get("id", []):
             log_change(div, "nav")
+        elif "section" in div.get("class", []) or "section" in div.get("id", []):
+            log_change(div, "section")
 
     # Convert <b> tags to <strong>
     for b_tag in soup.find_all("b"):
