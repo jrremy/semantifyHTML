@@ -1,6 +1,5 @@
 from openai import OpenAI
 from typing import Optional, Generator
-import redis
 import logging
 
 # Set up logging
@@ -12,8 +11,7 @@ def generate_explanation_stream(
     original_tag: str,
     new_tag: str,
     openai_client: Optional[OpenAI],
-    redis_client: Optional[redis.Redis],
-    redis_available: bool,
+    redis_client,
 ) -> Generator[str, None, None]:
     """
     Generate an explanation for the change from original_tag to new_tag.
@@ -50,17 +48,12 @@ Keep it concise (2-3 sentences max) and avoid generic statements about semantic 
 
     # Check Redis cache first
     cache_key = f"explanation:{original_tag}:{new_tag}"
-    if redis_available and redis_client:
-        try:
-            cached_explanation = redis_client.get(cache_key)
-            if cached_explanation:
-                logger.info(f"Cache hit for {cache_key}")
-                # Redis client is configured with decode_responses=True, so no need to decode
-                yield cached_explanation
-                return
-        except Exception as e:
-            logger.warning(f"Redis cache error: {e}")
-            # Continue without caching if Redis fails
+    if redis_client and redis_client.available:
+        cached_explanation = redis_client.get(cache_key)
+        if cached_explanation:
+            logger.info(f"Cache hit for {cache_key}")
+            yield cached_explanation
+            return
 
     try:
         # Try to use the latest model, fallback to older ones if needed
@@ -112,15 +105,13 @@ Keep it concise (2-3 sentences max) and avoid generic statements about semantic 
                 yield content
 
         # Cache the full explanation if Redis is available and we got a response
-        if redis_available and redis_client and full_explanation:
-            try:
-                # Cache for 24 hours (86400 seconds)
-                redis_client.setex(cache_key, 86400, full_explanation)
+        if redis_client and redis_client.available and full_explanation:
+            if redis_client.setex(cache_key, 86400, full_explanation):
                 logger.info(
                     f"Cached explanation for {cache_key} using model {used_model}"
                 )
-            except Exception as e:
-                logger.warning(f"Failed to cache explanation: {e}")
+            else:
+                logger.warning("Failed to cache explanation")
 
     except Exception as e:
         logger.error(f"Error generating explanation: {e}")

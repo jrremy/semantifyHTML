@@ -58,7 +58,7 @@ Make sure you have the following installed:
 
    ```bash
    git clone https://github.com/jrremy/semantifyHTML
-   cd semantifyHTML/server
+   cd semantifyHTML
    ```
 
 2. **Create a virtual environment**:
@@ -81,7 +81,7 @@ Make sure you have the following installed:
 4. **Install the backend dependencies**:
 
    ```bash
-   pip install -r requirements.txt
+   pip install -r server/requirements.txt
    ```
 
 5. **Set the OpenAI API key (optional)**:

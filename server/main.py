@@ -3,11 +3,11 @@ import logging
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from openai import OpenAI
-import redis
 from typing import Optional, Dict, Any
 
 import parse_html
 import explanation
+from redis_client import redis_client
 
 # Set up logging
 logging.basicConfig(
@@ -35,49 +35,6 @@ else:
     logger.warning(
         "OpenAI API key is missing, OpenAI-related features will be unavailable."
     )
-
-# Redis setup for caching AI-generated explanations
-redis_client: Optional[redis.Redis] = None
-redis_available: bool = False
-
-# Get Redis configuration from environment variables
-redis_host: str = os.environ.get("REDIS_HOST", "localhost")
-redis_port: int = int(os.environ.get("REDIS_PORT", 6379))
-
-
-def try_redis_connection():
-    """Try to establish Redis connection with retry logic."""
-    global redis_client, redis_available
-
-    try:
-        redis_client = redis.Redis(
-            host=redis_host,
-            port=redis_port,
-            db=0,
-            decode_responses=True,
-            socket_connect_timeout=10,
-            socket_timeout=10,
-            retry_on_timeout=True,
-        )
-        # Test the connection
-        redis_client.ping()
-        redis_available = True
-        logger.info(
-            f"Redis connection established successfully at {redis_host}:{redis_port}"
-        )
-        return True
-    except (redis.ConnectionError, redis.TimeoutError) as e:
-        logger.warning(f"Redis connection failed: {e}")
-        redis_available = False
-        return False
-    except Exception as e:
-        logger.error(f"Unexpected Redis error: {e}")
-        redis_available = False
-        return False
-
-
-# Try initial Redis connection
-try_redis_connection()
 
 
 @app.route("/convert", methods=["POST"])
@@ -130,7 +87,7 @@ def generate_explanation() -> Response:
         logger.info(f"Generating explanation for {original_tag} -> {new_tag}")
 
         explanation_stream = explanation.generate_explanation_stream(
-            original_tag, new_tag, openai_client, redis_client, redis_available
+            original_tag, new_tag, openai_client, redis_client
         )
 
         return Response(explanation_stream, content_type="text/plain")
@@ -177,13 +134,13 @@ def health_check() -> Response:
             - timestamp: Current timestamp
     """
     # Try to reconnect to Redis if it's not available
-    if not redis_available:
-        try_redis_connection()
+    if not redis_client.available:
+        redis_client.connect()
 
     status = {
         "status": "healthy",
         "openai_available": openai_client is not None,
-        "redis_available": redis_available,
+        "redis_available": redis_client.available,
         "timestamp": logging.Formatter().formatTime(
             logging.LogRecord("", 0, "", 0, "", (), None)
         ),
@@ -199,48 +156,16 @@ def test_redis() -> Response:
     Returns:
         JSON response with Redis test results
     """
-    if not redis_available:
+    if not redis_client.available:
         return jsonify({"error": "Redis not available"}), 503
 
-    try:
-        # Test basic operations
-        test_key = "test:cache:ping"
-        test_value = "pong"
+    # Use the Redis client's test method
+    test_result = redis_client.test_connection()
 
-        # Set a test value
-        redis_client.setex(test_key, 60, test_value)
-
-        # Get the test value
-        retrieved_value = redis_client.get(test_key)
-
-        # Delete the test value
-        redis_client.delete(test_key)
-
-        if retrieved_value == test_value:
-            return jsonify(
-                {
-                    "status": "success",
-                    "message": "Redis is working correctly",
-                    "test_key": test_key,
-                    "test_value": test_value,
-                    "retrieved_value": retrieved_value,
-                }
-            )
-        else:
-            return jsonify(
-                {
-                    "status": "error",
-                    "message": "Redis read/write test failed",
-                    "expected": test_value,
-                    "got": retrieved_value,
-                }
-            ), 500
-
-    except Exception as e:
-        logger.error(f"Redis test failed: {e}")
-        return jsonify(
-            {"status": "error", "message": f"Redis test failed: {str(e)}"}
-        ), 500
+    if test_result["status"] == "success":
+        return jsonify(test_result)
+    else:
+        return jsonify(test_result), 500
 
 
 if __name__ == "__main__":
