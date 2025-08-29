@@ -49,6 +49,10 @@ def convert() -> Response:
         JSON response containing:
             - semantic: The converted semantic HTML
             - changes: List of changes made during conversion
+
+    Raises:
+        400: If no HTML content is provided
+        500: If internal server error occurs
     """
     try:
         input_html: str = request.json.get("html", "")
@@ -73,6 +77,10 @@ def generate_explanation() -> Response:
 
     Returns:
         Streaming text response containing the explanation
+
+    Raises:
+        400: If required parameters are missing
+        500: If internal server error occurs
     """
     try:
         data: Dict[str, Any] = request.json
@@ -107,6 +115,10 @@ def load_url() -> Response:
     Returns:
         JSON response containing:
             - content: The HTML content of the webpage
+
+    Raises:
+        400: If no URL is provided
+        500: If error occurs loading the URL
     """
     try:
         url: str = request.json.get("url", "")
@@ -155,6 +167,10 @@ def test_redis() -> Response:
 
     Returns:
         JSON response with Redis test results
+
+    Raises:
+        503: If Redis is not available
+        500: If Redis test fails
     """
     if not redis_client.available:
         return jsonify({"error": "Redis not available"}), 503

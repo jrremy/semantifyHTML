@@ -21,7 +21,12 @@ class RedisClient:
         self.connect()
 
     def connect(self) -> bool:
-        """Establish Redis connection with retry logic."""
+        """
+        Establish Redis connection with retry logic.
+
+        Returns:
+            True if connection successful, False otherwise
+        """
         try:
             self.client = redis.Redis(
                 host=self.host,
@@ -49,7 +54,15 @@ class RedisClient:
             return False
 
     def get(self, key: str) -> Optional[str]:
-        """Get value from Redis cache."""
+        """
+        Get value from Redis cache.
+
+        Args:
+            key: The cache key to retrieve
+
+        Returns:
+            The cached value or None if not found or unavailable
+        """
         if not self.available or not self.client:
             return None
 
@@ -60,7 +73,17 @@ class RedisClient:
             return None
 
     def setex(self, key: str, time: int, value: str) -> bool:
-        """Set value in Redis cache with expiration."""
+        """
+        Set value in Redis cache with expiration.
+
+        Args:
+            key: The cache key to set
+            time: Expiration time in seconds
+            value: The value to cache
+
+        Returns:
+            True if successful, False otherwise
+        """
         if not self.available or not self.client:
             return False
 
@@ -72,7 +95,15 @@ class RedisClient:
             return False
 
     def delete(self, key: str) -> bool:
-        """Delete key from Redis cache."""
+        """
+        Delete key from Redis cache.
+
+        Args:
+            key: The cache key to delete
+
+        Returns:
+            True if successful, False otherwise
+        """
         if not self.available or not self.client:
             return False
 
@@ -84,7 +115,12 @@ class RedisClient:
             return False
 
     def ping(self) -> bool:
-        """Test Redis connection."""
+        """
+        Test Redis connection.
+
+        Returns:
+            True if connection is successful, False otherwise
+        """
         if not self.available or not self.client:
             return False
 
@@ -96,7 +132,12 @@ class RedisClient:
             return False
 
     def test_connection(self) -> Dict[str, Any]:
-        """Test Redis connection and basic operations."""
+        """
+        Test Redis connection and basic operations.
+
+        Returns:
+            Dictionary containing test results with status and message
+        """
         if not self.available:
             return {"status": "error", "message": "Redis not available"}
 
@@ -135,7 +176,12 @@ class RedisClient:
             return {"status": "error", "message": f"Redis test failed: {str(e)}"}
 
     def get_status(self) -> Dict[str, Any]:
-        """Get Redis connection status."""
+        """
+        Get Redis connection status.
+
+        Returns:
+            Dictionary containing connection status, host, and port
+        """
         return {
             "available": self.available,
             "host": self.host,

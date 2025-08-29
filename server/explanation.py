@@ -25,14 +25,13 @@ def generate_explanation_stream(
         new_tag: The new semantic HTML tag
         openai_client: OpenAI client instance for generating explanations
         redis_client: Redis client instance for caching explanations
-        redis_available: Whether Redis is available for caching
 
     Yields:
         str: Chunks of the explanation as they are generated
 
     Note:
         If OpenAI client is not available, returns an error message.
-        If Redis caching fails, continues without caching but logs warnings.
+        Redis caching is handled automatically by the Redis client.
     """
 
     if not openai_client:
